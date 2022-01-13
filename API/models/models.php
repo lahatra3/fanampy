@@ -1,6 +1,4 @@
 <?php
-header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Max-Age: 3600");
 // ****************** CONNEXION À LA BASE DE DONNÉES ******************
 class ConnexionDB{
     private $defaulValue = null;
