@@ -154,6 +154,25 @@ class SetPersonnes extends ConnexionDB{
         $database = null;
     }
     
+    // ********************** POUR VERIFIER SI UNE PERSONNE EST DÉJÀ MEMBRE ***********************
+    public function verifyMembres(array $donnees){
+        try{
+            $database = ConnexionDB::db_connect();
+            $demande = $database -> prepare('SELECT True, id FROM membres
+                WHERE (nom = :nom AND prenoms = :prenoms) OR email = :email');
+            $demande -> execute($donnees);
+            $reponse = $demande -> fetchAll(PDO::FETCH_ASSOC);
+            return $reponse;
+        }
+        catch(Exception $e){
+            $erreurs = [
+                'message' => $e -> getMessage(),
+                'code' => $e -> getCode()
+            ];
+            print_r(json_encode($erreurs, JSON_FORCE_OBJECT));
+        }
+    }
+
     // *************** POUR INSERER DES FORMATIONS ********************
     public function setFormations(array $donnees){
         try{

@@ -28,3 +28,5 @@ catch(Exception $e){
     ];
     print_r(json_encode($erreurs, JSON_FORCE_OBJECT));
 }
+unset($userData);
+unset($login);

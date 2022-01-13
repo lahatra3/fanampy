@@ -1,4 +1,5 @@
 <?php
+
 class GetPersonnesId{
     private $id = null;
 
@@ -52,8 +53,8 @@ class GetPersonnesMembres{
     public function setInfoMembres(string $nom, string $prenoms, string $adresse, 
             string $phone1, string $phone2, string $email, string $dateNaissance, 
             string $lieuNaissance, string $villeOrigine){
-        $this -> nom = strip_tags($nom);
-        $this -> prenoms = strip_tags($prenoms);
+        $this -> nom = ucwords(strip_tags($nom));
+        $this -> prenoms = ucwords(strip_tags($prenoms));
         $this -> adresse = strip_tags($adresse);
         $this -> phone1 = strip_tags($phone1); 
         $this -> phone2 = strip_tags($phone2);
@@ -74,6 +75,14 @@ class GetPersonnesMembres{
             'dateNaissance' => $this -> dateNaissance,
             'lieuNaissance' => $this -> lieuNaissance,
             'villeOrigine' => $this -> villeOrigine
+        ];
+    }
+
+    public function getInfoVerifyMembres(){
+        return [
+            'nom' => $this -> nom,
+            'prenoms' => $this -> prenoms,
+            'email' => $this -> email
         ];
     }
 }

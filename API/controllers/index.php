@@ -18,7 +18,7 @@ try{
             case 'get':
                 require_once('./getters.php');
                 if(!empty(trim($parametre[1]))){
-                    $personne = new PersonnesFanampy($_SESSION['id']);
+                    $getters = new PersonnesFanampy($_SESSION['id']);
                     switch($parametre[1]){
                         case 'membres':
                             $personne -> dataMembres();
@@ -33,12 +33,29 @@ try{
                         break;
                         default: throw new Exception("Paramètre invalide...!", 1);
                     }
+                    unset($membres);
                 }
                 else throw new Exception("Erreur 🙏, veuillez préciser les données à prendre !😊", 1);
             break;
 
             case 'add':
                 require_once('./adding.php');
+                if(!empty(trim($parametre[1]))){
+                    $adding = new AddingPersonnes($_SESSION['id']);
+                    switch($parametre[1]){
+                        case 'membres':
+                            $adding -> addMembres($_POST['nom'], $_POST['prenoms'], $_POST['adresse'],
+                        $_POST['phone1'], $_POST['phone2'], $_POST['email'], $_POST['dateNaissance'],
+                        $_POST['lieuNaissance'], $_POST['villeOrigine']);
+                        break;
+
+                        case 'formations':
+                        
+                        break;
+                    }
+                }
+                else throw new Exception("Erreur 🙏, veuillez préciser les données à prendre !😊", 1);
+                
             break;
 
             case 'set':
