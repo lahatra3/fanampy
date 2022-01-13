@@ -12,19 +12,19 @@ try{
             }
             else{
                 echo "Il paraît que vous n'êtes pas très active dans les activités de l'association.\n
-                Veuillez-vous renseigner aux administrateurs.\n Merci de votre aimable compréhension...!";
+                Veuillez-vous renseigner aux administrateurs 🙏.\n Merci de votre aimable compréhension !😊";
             }
         }
         else{
-            echo "Identifiant et/ou mot de passe incorrect !<br>Veuillez réessayer !";
+            echo "Identifiant et/ou mot de passe incorrect 🙏!<br>Veuillez réessayer !😊";
         }
     }
-    else throw new Exception("L'identifiant et/ou le mot de passe réçus sont vides...!", 1);   
+    else throw new Exception("L'identifiant et/ou le mot de passe réçus sont vides...!🙏", 1);   
 }
 catch(Exception $e){
     $erreurs = [
-        'message' => $e.getMessage(),
-        'code' => $e.getCode()
+        'message' => $e->getMessage(),
+        'code' => $e->getCode()
     ];
     print_r(json_encode($erreurs, JSON_FORCE_OBJECT));
 }

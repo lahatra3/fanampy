@@ -58,7 +58,7 @@ class GetPersonnes extends ConnexionDB{
             $database = ConnexionDB::db_connect();
             $demande = $database -> prepare('SELECT nom, etablissement, descriptions
                 FROM formations 
-                WHERE id_membre = :id');
+                WHERE id_membres = :id');
             $demande -> execute($donnees);
             $reponse = $demande -> fetchAll(PDO::FETCH_ASSOC);
             return $reponse;
