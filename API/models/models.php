@@ -14,7 +14,7 @@ class ConnexionDB{
         }
         catch(PDOException $e){
             $erreurs = [
-                'message' => "Nous n'avons pas pu connecter à la base de données.<br>".$e -> getMessage(),
+                'message' =>"Nous n'avons pas pu connecter à la base de données.".$e -> getMessage(),
                 'code' => $e -> getCode()
             ];
             print_r(json_encode($erreurs, JSON_FORCE_OBJECT));
@@ -33,18 +33,21 @@ class GetPersonnes extends ConnexionDB{
     // ********************* POUR PRENDRE LES DONNÉES D'UNE PERSONNE *******************
     public function getMembres(array $donnees){
         try{
-            $database = ConnexionDB::db_connect();
-            $demande = $database -> prepare('SELECT nom, prenoms, adresse, phone1, phone2, email, 
+            if(!empty(ConnexionDB::db_connect())){
+                $database = ConnexionDB::db_connect();
+                $demande = $database -> prepare('SELECT nom, prenoms, adresse, phone1, phone2, email, 
                     dateNaissance, lieuNaissance, villeOrigine, date_debut, date_fin, active
                 FROM membres 
-                WHERE id = :id');
-            $demande -> execute($donnees);
-            $reponse = $demande -> fetchAll(PDO::FETCH_ASSOC);
-            return $reponse;
+                WHERE id = :identifiant OR email = :identifiant');
+                $demande -> execute($donnees);
+                $reponse = $demande -> fetchAll(PDO::FETCH_ASSOC);
+                return $reponse;
+            }
+            else throw new Exception("Nous n'avons pas pu obtenir les données dans la table `membres`.", 1);
         }
         catch(PDOException $e){
             $erreurs = [
-                'message' => "Nous n'avons pas pu obtenir les données dans la table `membres`.<br>".$e -> getMessage(),
+                'message' => $e -> getMessage(),
                 'code' => $e -> getCode()
             ];
             print_r(json_encode($erreurs, JSON_FORCE_OBJECT));
@@ -56,9 +59,9 @@ class GetPersonnes extends ConnexionDB{
     public function getFormations(array $donnees){
         try{
             $database = ConnexionDB::db_connect();
-            $demande = $database -> prepare('SELECT nom, etablissement, descriptions
-                FROM formations 
-                WHERE id_membres = :id');
+            $demande = $database -> prepare('SELECT f.id, f.nom, f.etablissement, f.descriptions
+                FROM formations f JOIN membres m ON f.id_membres = m.id
+                WHERE f.id_membres = :identifiant OR m.email = :identifiant');
             $demande -> execute($donnees);
             $reponse = $demande -> fetchAll(PDO::FETCH_ASSOC);
             return $reponse;
@@ -77,9 +80,11 @@ class GetPersonnes extends ConnexionDB{
     public function getFonctions(array $donnees){
         try{
             $database = ConnexionDB::db_connect();
-            $demande = $database -> prepare('SELECT f.nom, b.nom AS departements
-                FROM fonctions f JOIN branches b ON b.id = f.id_branches 
-                WHERE f.id_membres = :id');
+            $demande = $database -> prepare('SELECT f.id, f.nom, b.nom AS departements
+                FROM fonctions f 
+                JOIN branches b ON b.id = f.id_branches 
+                JOIN membres m ON f.id_membres = m.id
+                WHERE f.id_membres = :identifiant OR m.email = :identifiant');
             $demande -> execute($donnees);
             $reponse = $demande -> fetchAll(PDO::FETCH_ASSOC);
             return $reponse;
@@ -105,7 +110,7 @@ class Login extends ConnexionDB{
     public function authentifier(array $donnees){
         try{
             $database = ConnexionDB::db_connect();
-            $demande = $database -> prepare('SELECT True, id, active 
+            $demande = $database -> prepare('SELECT True, id, active, email 
                 FROM membres
                 WHERE (email = :identifiant OR phone1 = :identifiant OR phone2 = :identifiant)
                     AND keyword = SHA2(:keypass, 256)');
@@ -158,8 +163,8 @@ class SetPersonnes extends ConnexionDB{
     public function verifyMembres(array $donnees){
         try{
             $database = ConnexionDB::db_connect();
-            $demande = $database -> prepare('SELECT True, id FROM membres
-                WHERE (nom = :nom AND prenoms = :prenoms) OR email = :email');
+            $demande = $database -> prepare('SELECT True, id, email FROM membres
+                WHERE email = :email');
             $demande -> execute($donnees);
             $reponse = $demande -> fetchAll(PDO::FETCH_ASSOC);
             return $reponse;
@@ -212,4 +217,107 @@ class SetPersonnes extends ConnexionDB{
         }
         $database = null;
     }
+}
+
+// ********************* CETTE CLASS EST UTILISÉE POUR LES MISES À JOURS ***********************
+class UpdatePersonnes extends ConnexionDB{
+    private $defaulValue = null;
+
+    public function __construct(string $name){
+        $this -> defaultValue = $name;
+    }
+
+    // ********************** MISE À JOUR DES INFORMATIONS DES MEMBRES *********************
+    public function updateMembres(array $donnees){
+        try{
+            $database = ConnexionDB::db_connect();
+            $demande = $database -> prepare('UPDATE membres 
+                SET adresse = :adresse, phone1 = :phone1, phone2 = :phone2, email = :email
+                WHERE id = :id');
+            $demande -> execute($donnees);
+            $database -> commit();
+        }
+        catch(Exception $e){
+            $database -> rollback();
+            $erreurs = [
+                'message' => "La mise à jours `membres` avait connu une erreur.<br>".$e ->  getMessage(),
+                'code' => $e.getCode()
+            ];
+            print_r(json_encode($erreurs, JSON_FORCE_OBJECT));
+        }
+        $database = null;
+    }
+
+    // ************************ MISE À JOUR DU MOT DE PASSE DES MEMBRES *************************
+    public function updateKeypass(array $donnees){
+        try{
+            $database = ConnexionDB::db_connect();
+            $demande = $database -> prepare('UPDATE membres
+                SET keypass = :keypass
+                WHERE email = :email');
+            $demande -> execute($donnees);
+            $database -> commit();
+        }
+        catch(PDOException $e){
+            $database -> rollback();
+            $erreurs = [
+                'message' => "La mise à jours du mot de passé s'est avèrée un échec.<br>".$e -> getMessage(),
+                'code' => $e -> getCode()
+            ];
+            print_r(json_encode($erreurs, JSON_FORCE_OBJECT));
+        }
+        $database = null;
+    }
+
+    // ********************* MISE À JOUR DES DONNÉES DE FORMATIONS *******************
+    public function updateFormations(array $donnees){
+        try{
+            $database = ConnexionDB::db_connect();
+            $demande = $database -> prepare('UPDATE formations
+                SET nom = :nom, etablissement = :etablissement, descriptions = :descriptions
+                WHERE id = :id');
+            $demande -> execute($donnees);
+            $database -> commit();
+        }
+        catch(Exception $e){
+            $database -> rollback();
+            $erreurs = [
+                'message' => "La mise à jours `formations` avait connu une erreur.<br>".$e ->  getMessage(),
+                'code' => $e.getCode()
+            ];
+            print_r(json_encode($erreurs, JSON_FORCE_OBJECT));
+        }
+        $database = null;
+    }
+
+    // ********************** MISE À JOUR DES DONNÉES FONCTIONS ************************
+    public function updateFonctions(array $donnees){
+        try{
+            $database = ConnexionDB::db_connect();
+            $demande = $database -> prepare('UPDATE fonctions
+                SET nom = :nom, id_branches = :id_branches 
+                WHERE id = :id');
+            $demande -> execute($donnees);
+            $database -> commit();
+        }
+        catch(Exception $e){
+            $database -> rollback();
+            $erreurs = [
+                'message' => "La mise à jours `fonctions` avait connu une erreur.<br>".$e ->  getMessage(),
+                'code' => $e.getCode()
+            ];
+            print_r(json_encode($erreurs, JSON_FORCE_OBJECT));
+        }
+        $database = null;
+    }
+}
+
+class DeletePersonnes extends ConnexionDB{
+    private $defaultValue = null;
+
+    public function __construct(string $name){
+        $this -> defaultValue = $name;
+    }
+
+
 }

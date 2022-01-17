@@ -1,17 +1,17 @@
 <?php
 class PersonnesFanampy{
-    private $identification = null;
+    private $identifiant = null;
 
-    public function __construct(int $nombre){
-        $this -> identification = (int) $nombre;
+    public function __construct(string $identifiant){
+        $this -> identifiant =  $identifiant;
     }
 
     // ******************* Pour avoir les identités des membres **********************
     public function dataMembres(){
         try{
             $personne = new GetPersonnes('fanampy');
-            $id = new GetPersonnesId($this -> identification);
-            echo json_encode($personne -> getMembres($id -> getInfoId()), JSON_FORCE_OBJECT); 
+            $id = new GetPersonnesInfos($this -> identifiant);
+            echo json_encode($personne -> getMembres($id -> getInfo()), JSON_FORCE_OBJECT); 
         }
         catch(Exception $e){
             $erreurs = [
@@ -28,8 +28,8 @@ class PersonnesFanampy{
     public function dataFormations(){
         try{
             $personne = new GetPersonnes('fanampy');
-            $id = new GetPersonnesId($this -> identification);
-            echo json_encode($personne -> getFormations($id -> getInfoId()), JSON_FORCE_OBJECT);
+            $id = new GetPersonnesInfos($this -> identifiant);
+            echo json_encode($personne -> getFormations($id -> getInfo()), JSON_FORCE_OBJECT);
         }
         catch(Exception $e){
             $erreurs = [
@@ -46,8 +46,8 @@ class PersonnesFanampy{
     public function dataFonctions(){
         try{
             $personne = new GetPersonnes('fanampy');
-            $id = new GetPersonnesId($this -> identification);
-            echo json_encode($personne -> getFonctions($id -> getInfoId()), JSON_FORCE_OBJECT);
+            $id = new GetPersonnesInfos($this -> identifiant);
+            echo json_encode($personne -> getFonctions($id -> getInfo()), JSON_FORCE_OBJECT);
         }
         catch(Exception $e){
             $erreurs = [

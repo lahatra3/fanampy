@@ -8,6 +8,7 @@ try{
         if($donnees['TRUE'] == 1){
             if($donnees['active'] == 1){
                 $_SESSION['id'] = $donnees['id'];
+                $_SESSION['email'] = $donnees['email'];
                 echo $donnees['TRUE'];
             }
             else{

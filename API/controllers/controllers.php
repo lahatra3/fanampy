@@ -1,14 +1,15 @@
 <?php
+class GetPersonnesInfos{
+    private $identifiant = null;
 
-class GetPersonnesId{
-    private $id = null;
-
-    public function __construct(int $id){
-        $this -> id = (int) strip_tags($id);
+    public function __construct(string $identifiant){
+        $this -> identifiant = strip_tags($identifiant);
     }
 
-    public function getInfoId(){
-        return ['id' => $this -> id];
+    public function getInfo(){
+        return [
+            'identifiant' => $this -> identifiant
+        ];
     }
 }
 
@@ -34,6 +35,7 @@ class GetPersonnesLogin{
     }
 }
 
+// ******************** THESE CLASSES ARE USED FOR ADDING PERSONNES
 class GetPersonnesMembres{
     private $defaultValue = null;
     private $nom = null;
@@ -80,8 +82,6 @@ class GetPersonnesMembres{
 
     public function getInfoVerifyMembres(){
         return [
-            'nom' => $this -> nom,
-            'prenoms' => $this -> prenoms,
             'email' => $this -> email
         ];
     }
@@ -137,6 +137,86 @@ class GetPersonnesFonctions{
             'nom' => $this -> nom,
             'id_branches' => $this -> id_branches,
             'id_membres' => $this -> id_membres
+        ];
+    }
+}
+
+// *********************** THESE FOLLOWING CLASS ARE USED FOR UPDATING **************************
+class UpdatePersonnesMembres{
+    private $identity = null;
+    private $adresse = null;
+    private $phone1 = null;
+    private $phone2 = null;
+    private $email = null;
+
+    public function __construct(int $identity){
+        $this -> identity = (int) $identity;
+    }
+
+    public function setInfoUpdateMembres(string $adresse, string $phone1, 
+        string $phone2, string $email){
+        $this -> adresse = strip_tags($adresse);
+        $this -> phone1 = strip_tags($phone1);
+        $this -> phone2 = strip_tags($phone2);
+        $this -> email = strip_tags($email);
+    }
+
+    public function getInfoUpdateMembres(){
+        return [
+            'adresse' => $this -> adresse,
+            'phone1' => $this -> phone1,
+            'phone2' => $this -> phone2,
+            'email' => $this -> email,
+            'id' => $this -> identity
+        ];
+    }
+}
+
+class UpdatePersonnesFormations{
+    private $identity = null;
+    private $nom = null;
+    private $etablissement = null;
+    private $descriptions = null;
+
+    public function __construct(int $nombre){
+        $this -> identity = (int) $nombre;
+    }
+
+    public function setInfoUpdateFormations(string $nom, string $etablissement, string $descriptions){
+        $this -> nom = strip_tags($nom);
+        $this -> etablissement = strip_tags($etablissement);
+        $this -> descriptions = strip_tags($descriptions);
+    }
+
+    public function getInfoUpdateFormations(){
+        return [
+            'nom' => $this -> nom,
+            'etablissement' => $this -> etablissement,
+            'descriptions' => $this -> descriptions,
+            'id' => $this -> identity
+        ];
+    }
+}
+
+class UpdatePersonnesFonctions{
+    private $identity = null;
+    private $nom = null;
+    private $id_branches = null;
+
+    public function __construct(int $nombre){
+        $this -> identity = $nombre;
+    }
+
+    public function setInfoUpdateFonctions(string $nom, int $id_branches){
+        $this -> nom = strip_tags($nom);
+        $this -> id_branches = strip_tags($id_branches);
+    }
+
+    public function getInfoUpdateFonctions(){
+        return [
+            'nom' => $this -> nom,
+            'id_branches' => $this -> id_branches,
+            'id' => $this -> identity
         ];
     }
 }
