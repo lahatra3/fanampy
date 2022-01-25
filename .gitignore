@@ -1,2 +1,3 @@
-API/db-conception.txt
-API/fanampy.sql
+api_fanampy/db-conception.txt
+api_fanampy/fanampy.sql
+.gitignore

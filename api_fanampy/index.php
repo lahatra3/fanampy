@@ -1,9 +1,9 @@
 <?php
 session_start();
+header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Max-Age: 3600");
-header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 include_once('models/models.php');
 include_once('controllers/controllers.php');
 
@@ -22,7 +22,7 @@ try{
                     elseif(!empty(trim($parametre[2])) && preg_match("#^[a-z0-9._-]+@[a-z0-9]{2,7}\.[a-z]{2,4}$#", trim($parametre[2]))){
                         $getters = new PersonnesFanampy($parametre[2]);
                     }
-                    else throw new Exception("Email invalide !", 1);
+                    else throw new Exception("Email invalide !😊", 1);
                     switch($parametre[1]){
                         case 'membres':
                             $getters -> dataMembres();
@@ -35,7 +35,7 @@ try{
                         case 'fonctions':
                             $getters -> dataFonctions();
                         break;
-                        default: throw new Exception("Paramètre invalide...!", 1);
+                        default: throw new Exception("Paramètre invalide...!🙏", 1);
                     }
                     unset($getters);
                 }

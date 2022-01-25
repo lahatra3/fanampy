@@ -9,7 +9,7 @@ class ConnexionDB{
 
     protected function db_connect(){
         try{
-            return new PDO('mysql:host=localhost; dbname=fanampy; charset=utf8', 'root', '', 
+            return new PDO('mysql:host=localhost; dbname=fanampy; charset=utf8', 'jitiy', '01Lah_tr*@ro0t/*', 
                 array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));
         }
         catch(PDOException $e){
