@@ -1,5 +1,5 @@
 <?php
-abstract class Database {
+class Database {
     private string $host;
     private string $database;
     private string $user;
@@ -13,7 +13,7 @@ abstract class Database {
         $this->password = $lahatra->password;
     }
 
-    protected function db_connect():object {
+    protected function db_connect() {
         try {
             return new PDO("mysql:host=$this->host; dbname=$this->database; charset=utf8", 
                 $this->user, $this->password,
@@ -28,3 +28,14 @@ abstract class Database {
     }
 }
 
+class Membres extends Database {
+    public function __construct() { }
+
+    public function getAllMembres() {
+        return Database::db_connect();
+    }
+}
+
+$lahatra = new Membres;
+
+print_r($lahatra->getAllMembres());
