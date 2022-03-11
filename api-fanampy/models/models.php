@@ -331,7 +331,23 @@ class Fonctions {
         $database=null;
     }
 
-    
+    public function updateFonctions(array $donnees) {
+        try {
+            $database=Database::db_connect();
+            $demande=$database->prepare('UPDATE fonctions
+                SET nom=:nom, id_branches=:id_branches, id_membres=:id_membres
+                WHERE id=:identifiant');
+            $demande->execute($donnees);
+        }
+        catch(PDOException $e) {
+            $database->rollBack();
+            print_r(json_encode([
+                'status' => false,
+                'message' => "Nous n'avons pas pu mettre à jour FONCTIONS. ".$e->getMessage()
+            ], JSON_FORCE_OBJECT));
+        }
+        $database=null;
+    }
 }
 
 $lahatra = new Membres;
