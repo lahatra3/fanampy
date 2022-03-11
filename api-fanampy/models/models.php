@@ -106,7 +106,7 @@ class Membres extends Database {
     public function updateMembres(array $donnees) {
         try {
             $database=Database::db_connect();
-            $demande=$database->prepare('UPDATE membre
+            $demande=$database->prepare('UPDATE membres
                 SET adresse=:adresse, phone1=:phone1, phone2=:phone2
                 WHERE id=:identifiant');
             $demande->execute($donnees);
@@ -120,6 +120,21 @@ class Membres extends Database {
         $database=null;
     }
 
+    public function deleteMembres(array $donnees) {
+        try {
+            $database=Database::db_connect();
+            $demande=$database->prepare('DELETE FROM membres
+                WHERE id=:identifiant');
+            $demande->execute($donnees);
+        }
+        catch(PDOException $e) {
+            print_r(json_encode([
+                'status' => false,
+                'message' => "Nous n'avons pas pu supprimer MEMBRES. ".$e->getMessage()
+            ], JSON_FORCE_OBJECT));
+        }
+        $database=null;
+    }
 }
 
 $lahatra = new Membres;
