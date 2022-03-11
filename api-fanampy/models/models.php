@@ -291,6 +291,47 @@ class Fonctions {
         }
         $database=null;
     }
+
+    public function getFonctions(array $donnees): array {
+        try {
+            $database=Database::db_connect();
+            $demande=$database->prepare('SELECT f.id, f.nom, f.id_branches, f.id_membres
+                FROM fonctions f
+                JOIN membres m ON f.id_membres=m.id
+                WHERE m.active = 1 AND (f.id_membres=:identifiant 
+                    OR m.email=:identifiant)');
+            $demande->execute($donnees);
+            $reponses=$demande->fetchAll(PDO::FETCH_ASSOC);
+            $demande->closeCursor();
+            return $reponses;
+        }
+        catch(PDOException $e) {
+            print_r(json_encode([
+                'status' => false,
+                'message' => "Nous n'avons pas pu obtenir FONCTIONS. ".$e->getMessage()
+            ], JSON_FORCE_OBJECT));
+        }
+        $database=null;
+    }
+
+    public function addFonctions(array $donnees) {
+        try {
+            $database=Database::db_connect();
+            $demande=$database->prepare('INSERT INTO fonctions(nom, id_branches, id_membres)
+                VALUES(:nom, :id_branches, id_membres)');
+            $demande->execute($donnees);
+        }
+        catch(PDOException $e) {
+            $database->rollBack();
+            print_r(json_encode([
+                'status' => false,
+                'message' => "Nous n'avons pas pu ajouter FONCTIONS. ".$e->getMessage()
+            ], JSON_FORCE_OBJECT));
+        }
+        $database=null;
+    }
+
+    
 }
 
 $lahatra = new Membres;
