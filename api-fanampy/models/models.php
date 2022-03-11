@@ -71,7 +71,7 @@ class Membres extends Database {
     protected function verifyMembres(array $donnees) {
         $database=Database::db_connect();
         $demande=$database->prepare('SELECT True FROM membres
-            WHERE (nom=:nom AND prenoms=:prenoms) OR email=:email');
+            WHERE (nom=:nom AND prenoms=:prenoms) OR email=:email OR keypass=SHA2(:keypass, 256)');
         $demande->execute($donnees);
         $reponses=$demande->fetch(PDO::FETCH_ASSOC);
         $demande->closeCursor();
@@ -270,7 +270,7 @@ class Formations extends Database {
     }
 }
 
-class Fonctions {
+class Fonctions extends Database {
 
     public function getAllFonctions(): array {
         try {
@@ -367,5 +367,26 @@ class Fonctions {
     }
 }
 
-$lahatra = new Membres;
-print_r(json_encode($lahatra->getAllMembres(), JSON_FORCE_OBJECT));
+class Login extends Database {
+
+    public function authentifier(array $donnees) {
+        try {
+            $database=Database::db_connect();
+            $demande=$database->prepare('SELECT True, id, email
+                FROM membres
+                WHERE (email=:email OR phone1=:phone1 OR phone2=:phone2) 
+                    AND keypass=SHA2(:keypass, 256)');
+            $demande->execute($donnees);
+            $reponses=$demande->fetch(PDO::FETCH_ASSOC);
+            $demande->closeCursor();
+            return $reponses;
+        }
+        catch(PDOException $e) {
+            print_r(json_encode([
+                'status' => false,
+                'message' => "Nous n'avons pas pu obtenir les données d'authentifications. ".$e->getMessage()
+            ], JSON_FORCE_OBJECT));
+        }
+        $database=null;
+    }
+}
