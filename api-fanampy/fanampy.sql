@@ -22,7 +22,7 @@ CREATE DATABASE IF NOT EXISTS `fanampy`;
 USE `fanampy`;
 
 -- ---------------------------------------------
-CREATE TABLE `membres`(
+CREATE TABLE IF NOT EXISTS `membres`(
     `id` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `nom` VARCHAR(255) NOT NULL,
     `prenoms` VARCHAR(255) NOT NULL,
@@ -33,13 +33,13 @@ CREATE TABLE `membres`(
     `dateNaissance` DATE NOT NULL,
     `lieuNaissance` VARCHAR(255) NOT NULL,
     `villeOrigine` VARCHAR(255),
-    `date_debut` DATETIME NOT NULL,
+    `date_debut` DATETIME DEFAULT NULL,
     `date_fin` DATETIME,
-    `keypass` VARCHAR(255),
+    `keypass` VARCHAR(255) DEFAULT NULL,
     `active` INT(11)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE `formations`(
+CREATE TABLE IF NOT EXISTS `formations`(
     `id` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `nom` VARCHAR(255) NOT NULL,
     `etablissement` VARCHAR(255) NOT NULL,
@@ -48,7 +48,7 @@ CREATE TABLE `formations`(
     CONSTRAINT `fk_membres_id_formations` FOREIGN KEY(`id_membres`) REFERENCES `membres`(`id`)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE `branches`(
+CREATE TABLE IF NOT EXISTS `branches`(
     `id` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `nom` VARCHAR(255) NOT NULL
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -58,7 +58,7 @@ INSERT INTO `branches`(`id`,`nom`) VALUES
 (2, 'sociale'),
 (3, 'sensibilisation');
 
-CREATE TABLE `fonctions`(
+CREATE TABLE IF NOT EXISTS `fonctions`(
     `id` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `nom` VARCHAR(255),
     `id_branches` INT(11) NOT NULL,
