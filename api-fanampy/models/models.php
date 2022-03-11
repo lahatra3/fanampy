@@ -2,7 +2,7 @@
 abstract class Database {
     
     public function __construct() {
-        $lahatra=json_decode(file_get_contents('./db.json'));
+        $lahatra=json_decode(file_get_contents('./models/db.json'));
         $this->host = $lahatra->host;
         $this->dbname = $lahatra->dbname;
         $this->user = $lahatra->user;
@@ -30,7 +30,7 @@ class Membres extends Database {
     public function getAllMembres():array {
         try {
             $database=Database::db_connect();
-            $demande=$database -> query('SELECT nom, prenoms, adresse, phone1, phone2, email, 
+            $demande=$database -> query('SELECT id, nom, prenoms, adresse, phone1, phone2, email, 
                     dateNaissance, lieuNaissance, villeOrigine, date_debut, date_fin, active
                 FROM membres 
                 WHERE active = 1');
@@ -50,7 +50,7 @@ class Membres extends Database {
     public function getMembres(array $donnees) {
         try {
             $database=Database::db_connect();
-            $demande=$database->prepare('SELECT nom, prenoms, adresse, phone1, phone2, email, 
+            $demande=$database->prepare('SELECT id, nom, prenoms, adresse, phone1, phone2, email, 
                  dateNaissance, lieuNaissance, villeOrigine, date_debut, date_fin, active
                 FROM membres 
                 WHERE active = 1 AND (id=:identifiant OR email=:identifiant)');
@@ -176,11 +176,13 @@ class Membres extends Database {
 
 class Formations extends Database {
 
-    public function getAllFormations() {
+    public function getAllFormations(): array {
         try {
             $database=Database::db_connect();
-            $demande=$database->query('SELECT nom, etablissement, descriptions, id_membres
-                FROM formations');
+            $demande=$database->query('SELECT f.nom, etablissement, descriptions, id_membres
+                FROM formations f
+                JOIN membres m ON f.id_membres=m.id
+                WHERE m.active = 1');
             $reponses=$demande->fetchAll(PDO::FETCH_ASSOC);
             $demande->closeCursor();
             return $reponses;
@@ -188,19 +190,19 @@ class Formations extends Database {
         catch(PDOException $e) {
             print_r(json_encode([
                 'status' => false, 
-                'message' => "Nous n'avons pas pu obtenir FORMATIONS ALL. ".$e->getMessage()
+                'message' => "Nous n'avons pas pu obtenir FORMATIONS TOUT. ".$e->getMessage()
             ], JSON_FORCE_OBJECT));
         }
         $database=null;
     }
 
-    public function getFormations(array $donnees) {
+    public function getFormations(array $donnees): array {
         try {
             $database=Database::db_connect();
-            $demande=$database->query('SELECT f.nom, f.etablissement, f.descriptions, f.id_membres
+            $demande=$database->query('SELECT f.id, f.nom, f.etablissement, f.descriptions, f.id_membres
                 FROM formations f
                 JOIN membres m ON f.id_membres=m.id
-                WHERE f.id_membres=:identifiant OR m.email=:identifiant');
+                WHERE m.active = 1 AND (f.id_membres=:identifiant OR m.email=:identifiant)');
             $demande->execute($donnees);
             $reponses=$demande->fetchAll(PDO::FETCH_ASSOC);
             $demande->closeCursor();
@@ -262,6 +264,29 @@ class Formations extends Database {
             print_r(json_encode([
                 'status' => false,
                 'message' => "Nous n'avons pas pu supprimer FORMATIONS. ".$e->getMessage()
+            ], JSON_FORCE_OBJECT));
+        }
+        $database=null;
+    }
+}
+
+class Fonctions {
+
+    public function getAllFonctions(): array {
+        try {
+            $database=Database::db_connect();
+            $demande=$database->query('SELECT f.id, f.nom, f.id_branches, f.id_membres
+                FROM fonctions f
+                JOIN membres m ON f.id_membres=m.id
+                WHERE m.active = 1');
+            $reponses=$demande->fetchAll(PDO::FETCH_ASSOC);
+            $demande->closeCursor();
+            return $reponses;
+        }
+        catch(PDOException $e) {
+            print_r(json_encode([
+                'status' => false,
+                'message' => "Nous n'avons pas pu obtenir FONCTIONS TOUT. ".$e->getMessage()
             ], JSON_FORCE_OBJECT));
         }
         $database=null;
