@@ -79,9 +79,10 @@ class Membres extends Database {
         return $reponses['TRUE'];
     }
 
-    public function addMembres(array $donnees) {
+    public function addMembres(array $donnees, array $verify) {
         try {
-            if($this->verifyMembres()===1) {
+            $status=0;
+            if($this->verifyMembres($verify)===1) {
                 $database=Database::db_connect();
                 $demande=$database->prepare('INSERT INTO membres(nom, prenoms, adresse, 
                     phone1, phone2, email, dateNaisssance, lieuNaissance, villeOrigine,
@@ -91,7 +92,6 @@ class Membres extends Database {
                 $demande->execute($donnees);
                 $status=1;
             }
-            else $status=0;
             return $status;
         }
         catch(PDOException $e) {
@@ -118,6 +118,38 @@ class Membres extends Database {
             ], JSON_FORCE_OBJECT));
         }
         $database=null;
+    }
+
+    protected function verifyKeypass(array $donnees) {
+        $database=Database::db_connect();
+        $demande=$database->prepare('SELECT True FROM membres
+            WHERE email=:email AND keypass=SHA2(:lastKey, 256)');
+        $demande->execute($donnees);
+        $reponses=$demande->fetch(PDO::FETCH_ASSOC);
+        $demande->closeCursor();
+        if(empty($reponses)) $reponses['TRUE']=0;
+        return $reponses['TRUE'];
+    }
+
+    public function updateMembresKeypass(array $donnees, array $verify) {
+        try {
+            $status=0;
+            if($this->verifyKeypass($verify)===1) {
+                $database=Database::db_connect();
+                $demande=$database->prepare('UPDATE membres 
+                    SET keypass=SHA2(:newKey, 256)
+                    WHERE id=:identifiant');
+                $demande->execute($donnees);
+                $status = 1;
+            }
+            return $status;
+        }
+        catch(PDOException $e) {
+            print_r(json_encode([
+                'status' => false,
+                'message' => "Nous n'avons pas mettre à jours MOT DE PASSE. ".$e->getMessage()
+            ], JSON_FORCE_OBJECT));
+        }
     }
 
     public function deleteMembres(array $donnees) {
