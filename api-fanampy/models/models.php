@@ -169,5 +169,48 @@ class Membres extends Database {
     }
 }
 
+
+class Formations extends Database {
+
+    public function getAllFormations() {
+        try {
+            $database=Database::db_connect();
+            $demande=$database->query('SELECT nom, etablissement, descriptions, id_membres
+                FROM formations');
+            $reponses=$demande->fetchAll(PDO::FETCH_ASSOC);
+            $demande->closeCursor();
+            return $reponses;
+        }
+        catch(PDOException $e) {
+            print_r(json_encode([
+                'status' => false, 
+                'message' => "Nous n'avons pas pu obtenir FORMATIONS ALL. ".$e->getMessage()
+            ], JSON_FORCE_OBJECT));
+        }
+        $database=null;
+    }
+
+    public function getFormations(array $donnees) {
+        try {
+            $database=Database::db_connect();
+            $demande=$database->query('SELECT f.nom, f.etablissement, f.descriptions, f.id_membres
+                FROM formations f
+                JOIN membres m ON f.id_membres=m.id
+                WHERE f.id_membres=:identifiant OR m.email=:identifiant');
+            $demande->execute($donnees);
+            $reponses=$demande->fetchAll(PDO::FETCH_ASSOC);
+            $demande->closeCursor();
+            return $reponses;
+        }
+        catch(PDOException $e) {
+            print_r(json_encode([
+                'status' => false,
+                'message' => "Nous n'avons pas pu obtenir FORMATIONS. ".$e->getMessage()
+            ], JSON_FORCE_OBJECT));
+        }
+        $database=null;
+    }
+}
+
 $lahatra = new Membres;
 print_r(json_encode($lahatra->getAllMembres(), JSON_FORCE_OBJECT));
