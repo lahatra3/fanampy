@@ -348,6 +348,23 @@ class Fonctions {
         }
         $database=null;
     }
+
+    public function deleteFonctions(array $donnees) {
+        try {
+            $database=Database::db_connect();
+            $demande=$database->prepare('DELETE FROM fonctions
+                WHERE id=:identifiant');
+            $demande->execute($donnees);
+        }
+        catch(PDOException $e) {
+            $database->rollBack();
+            print_r(json_encode([
+                'status' => false,
+                'message' => "Nous n'avons pas pu supprimer FONCTIONS. ".$e->getMessage()
+            ], JSON_FORCE_OBJECT));
+        }
+        $database=null;
+    }
 }
 
 $lahatra = new Membres;
