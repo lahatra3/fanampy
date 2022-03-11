@@ -1,33 +1,34 @@
 <?php
-try{
-    if(!empty($_POST['identifiant']) && !empty($_POST['keypass'])){
-        $userData = new GetPersonnesLogin('fanampy');
-        $userData -> setInfoLogin($_POST['identifiant'], $_POST['keypass']);
-        $login = new Login('fanampy');
-        $donnees = $login -> authentifier($userData -> getInfoLogin());
-        if($donnees['TRUE'] == 1){
-            if($donnees['active'] == 1){
-                $_SESSION['id'] = $donnees['id'];
-                $_SESSION['email'] = $donnees['email'];
-                echo $donnees['TRUE'];
-            }
-            else{
-                echo "Il paraît que vous n'êtes pas très active dans les activités de l'association.\n
-                Veuillez-vous renseigner aux administrateurs 🙏.\n Merci de votre aimable compréhension !😊";
-            }
+class ControllerLogin {
+
+    public function __construct(string $identifiant, string $password) {
+        if(!empty(trim($identifiant)) && !empty(trim($password))) {
+            $this->data=[
+                'identifiant' => strip_tags($identifiant),
+                'keypass' => $password
+            ];
         }
-        else{
-            echo "Identifiant et/ou mot de passe incorrect 🙏!<br>Veuillez réessayer !😊";
-        }
+        else throw new Exception("Erreur: les paramètres d'enthentifications sont vides 😥.");
     }
-    else throw new Exception("L'identifiant et/ou le mot de passe réçus sont vides...!🙏", 1);   
+
+    public function apiLogin() {
+        $login=new Login;
+        $resultats=$login->authentifier($this->data);
+        unset($login);
+        print_r(json_encode($resultats, JSON_FORCE_OBJECT));
+    }
+
+    public function sessionLogin() {
+        $login=new Login;
+        $resultats=$login->authentifier($this->data);
+        unset($resultats);
+        $_SESSION['TRUE'] = $resultats['TRUE'];
+        $_SESSION['id'] = $resultats['id'];
+        $_SESSION['email'] = $resultats['email'];
+        print_r(json_encode($resultats, JSON_FORCE_OBJECT));
+    }
+
+    public function getSession() {
+        print_r(json_encode($_SESSION, JSON_FORCE_OBJECT));
+    }
 }
-catch(Exception $e){
-    $erreurs = [
-        'message' => $e->getMessage(),
-        'code' => $e->getCode()
-    ];
-    print_r(json_encode($erreurs, JSON_FORCE_OBJECT));
-}
-unset($userData);
-unset($login);

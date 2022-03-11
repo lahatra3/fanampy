@@ -374,7 +374,7 @@ class Login extends Database {
             $database=Database::db_connect();
             $demande=$database->prepare('SELECT True, id, email
                 FROM membres
-                WHERE (email=:email OR phone1=:phone1 OR phone2=:phone2) 
+                WHERE (email=:identifiant OR phone1=:identifiant OR phone2=:identifiant) 
                     AND keypass=SHA2(:keypass, 256)');
             $demande->execute($donnees);
             $reponses=$demande->fetch(PDO::FETCH_ASSOC);
