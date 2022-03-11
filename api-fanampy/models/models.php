@@ -95,6 +95,7 @@ class Membres extends Database {
             return $status;
         }
         catch(PDOException $e) {
+            $database->rollBack();
             print_r(json_encode([
                 'status' => false,
                 'message' => "Nous n'avons pas pu ajouter MEMBRES. ".$e->getMessage()
@@ -112,6 +113,7 @@ class Membres extends Database {
             $demande->execute($donnees);
         }
         catch(PDOException $e) {
+            $database->rollBack();
             print_r(json_encode([
                 'status' => false,
                 'message' => "Nous n'avons pas pu mettre à jours MEMBRES. ".$e->getMessage()
@@ -145,6 +147,7 @@ class Membres extends Database {
             return $status;
         }
         catch(PDOException $e) {
+            $database->rollBack();
             print_r(json_encode([
                 'status' => false,
                 'message' => "Nous n'avons pas mettre à jours MOT DE PASSE. ".$e->getMessage()
@@ -160,6 +163,7 @@ class Membres extends Database {
             $demande->execute($donnees);
         }
         catch(PDOException $e) {
+            $database->rollBack();
             print_r(json_encode([
                 'status' => false,
                 'message' => "Nous n'avons pas pu supprimer MEMBRES. ".$e->getMessage()
@@ -206,6 +210,58 @@ class Formations extends Database {
             print_r(json_encode([
                 'status' => false,
                 'message' => "Nous n'avons pas pu obtenir FORMATIONS. ".$e->getMessage()
+            ], JSON_FORCE_OBJECT));
+        }
+        $database=null;
+    }
+
+    public function addFormations(array $donnees) {
+        try {
+            $database=Database::db_connect();
+            $demande=$database->prepare('INSERT INTO formations(nom, etablissement,
+                descriptions, id_membres)
+                VALUES(:nom, :etablissement, :descriptions, :id_membres)');
+            $demande->execute($donnees);
+        }
+        catch(PDOException $e) {
+            $database->rollBack();
+            print_r(json_encode([
+                'status' => false,
+                'message' => "Nous n'avons pas ajouter FORMATIONS. ".$e->getMessage()
+            ], JSON_FORCE_OBJECT));
+        }
+    }
+
+    public function updateFormations(array $donnees) {
+        try {
+            $database=Database::db_connect();
+            $demande=$database->prepare('UPDATE formations 
+                SET nom=:nom, etablissement=:etablissement, descriptions=:descriptions
+                    WHERE id=:identifiant');
+            $demande->execute($donnees);
+        }
+        catch(PDOException $e) {
+            $database->rollBack();
+            print_r(json_encode([
+                'status' => false,
+                'message' => "Nous n'avons pas pu mettre à jour FORMATIONS. ".$e->getMessage()
+            ], JSON_FORCE_OBJECT));
+        }
+        $database=null;
+    }
+
+    public function deleteFormations(array $donnees) {
+        try {
+            $database=Database::db_connect();
+            $demande=$database->prepare('DELETE FROM formations 
+                WHERE id=:identifiant');
+            $demande->execute($donnees);
+        }
+        catch(PDOException $e) {
+            $database->rollBack();
+            print_r(json_encode([
+                'status' => false,
+                'message' => "Nous n'avons pas pu supprimer FORMATIONS. ".$e->getMessage()
             ], JSON_FORCE_OBJECT));
         }
         $database=null;
