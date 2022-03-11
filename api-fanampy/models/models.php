@@ -65,6 +65,7 @@ class Membres extends Database {
                 'message' => "Nous n'avons pas pu obtenir MEMBRES. ".$e->getMessage()
             ], JSON_FORCE_OBJECT));
         }
+        $database=null;
     }
 
     protected function verifyMembres(array $donnees) {
@@ -99,7 +100,26 @@ class Membres extends Database {
                 'message' => "Nous n'avons pas pu ajouter MEMBRES. ".$e->getMessage()
             ], JSON_FORCE_OBJECT));
         }
+        $database=null;
     }
+
+    public function updateMembres(array $donnees) {
+        try {
+            $database=Database::db_connect();
+            $demande=$database->prepare('UPDATE membre
+                SET adresse=:adresse, phone1=:phone1, phone2=:phone2
+                WHERE id=:identifiant');
+            $demande->execute($donnees);
+        }
+        catch(PDOException $e) {
+            print_r(json_encode([
+                'status' => false,
+                'message' => "Nous n'avons pas pu mettre à jours MEMBRES. ".$e->getMessage()
+            ], JSON_FORCE_OBJECT));
+        }
+        $database=null;
+    }
+
 }
 
 $lahatra = new Membres;
