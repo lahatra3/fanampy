@@ -62,7 +62,41 @@ class Membres extends Database {
         catch(PDOException $e) {
             print_r(json_encode([
                 'status' => false,
-                'message' => "Nous n'avons pas obtenir MEMBRES.".$e->getMessage()
+                'message' => "Nous n'avons pas pu obtenir MEMBRES. ".$e->getMessage()
+            ], JSON_FORCE_OBJECT));
+        }
+    }
+
+    protected function verifyMembres(array $donnees) {
+        $database=Database::db_connect();
+        $demande=$database->prepare('SELECT True FROM membres
+            WHERE (nom=:nom AND prenoms=:prenoms) OR email=:email');
+        $demande->execute($donnees);
+        $reponses=$demande->fetch(PDO::FETCH_ASSOC);
+        $demande->closeCursor();
+        if(empty($reponses)) $reponses['TRUE']=0;
+        return $reponses['TRUE'];
+    }
+
+    public function addMembres(array $donnees) {
+        try {
+            if($this->verifyMembres()===1) {
+                $database=Database::db_connect();
+                $demande=$database->prepare('INSERT INTO membres(nom, prenoms, adresse, 
+                    phone1, phone2, email, dateNaisssance, lieuNaissance, villeOrigine,
+                    keypass)
+                    VALUES(:nom, :prenoms, :adresse, :phone1, :phone2, :email, 
+                    :dateNaissance, :lieuNaissance, :villeOrigine, :keypass)');
+                $demande->execute($donnees);
+                $status=1;
+            }
+            else $status=0;
+            return $status;
+        }
+        catch(PDOException $e) {
+            print_r(json_encode([
+                'status' => false,
+                'message' => "Nous n'avons pas pu ajouter MEMBRES. ".$e->getMessage()
             ], JSON_FORCE_OBJECT));
         }
     }

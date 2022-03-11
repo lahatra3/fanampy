@@ -33,10 +33,10 @@ CREATE TABLE IF NOT EXISTS `membres`(
     `dateNaissance` DATE NOT NULL,
     `lieuNaissance` VARCHAR(255) NOT NULL,
     `villeOrigine` VARCHAR(255),
-    `date_debut` DATETIME DEFAULT NULL,
-    `date_fin` DATETIME,
+    `date_debut` DATETIME DEFAULT NOW(),
+    `date_fin` DATETIME DEFAULT NULL,
     `keypass` VARCHAR(255) DEFAULT NULL,
-    `active` INT(11)
+    `active` INT(11) DEFAULT 1
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `formations`(
