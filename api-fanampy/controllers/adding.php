@@ -1,98 +1,47 @@
 <?php
-class AddingPersonnes{
-    private $defaultValue = null;
+class ControllerAdd {
 
-    public function __construct(string $name){
-        $this -> defaultValue = $name;
-    }
+    public function membres(string $nom, string $prenoms, string $adresse,
+        string $phone1, string $phone2, string $email, string $dateNaissance,
+        string $lieuNaissance, string $villeOrigine, string $keypass) {
 
-    //  ****************** Pour ajouter des membres *******************
-    public function addMembres($nom, $prenoms, $adresse, $phone1, $phone2, $email,
-        $dateNaissance, $lieuNaissance, $villeOrigine){
-        try{
-            if(!empty($nom) && !empty($prenoms) && !empty($adresse)
-             && !empty($phone1) && !empty($email) && !empty($dateNaissance)
-              && !empty($lieuNaissance) && !empty($villeOrigine)){
-                $userData = new GetPersonnesMembres('fanampy');
-                $userData -> setInfoMembres($nom, $prenoms, $adresse, $phone1, $phone2, $email,
-                    $dateNaissance, $lieuNaissance, $villeOrigine);
-                $personne = new SetPersonnes('fanampy');
-                $donnees = $personne -> verifyMembres($userData -> getInfoVerifyMembres());
-                if($donnees['TRUE'] == '1'){
-                    echo "Il semblerait que l'adresse email que vous avez entrés,
-                 existe déjà !";
-                }
-                else{
-                    $personne -> setMembres($userData -> getInfoMembres());
-                    $donnees = $personne -> verifyMembres($userData -> getInfoVerifyMembres());
-                    if($donnees['TRUE'] == '1'){
-                        $_SESSION['id'] = $donnees['id'];
-                        $_SESSION['email'] = $donnees['email'];
-                        echo $donnees['TRUE'];
+            if(!empty(trim($nom)) && !empty(trim($prenoms))  && !empty(trim($adresse))
+             && !empty(trim($phone1)) && !empty(trim($email)) && !empty(trim($dateNaissance)) 
+             && !empty(trim($lieuNaissance)) && !empty(trim($villeOrigine)) 
+             && !empty(trim($keypass))) {
+
+                if(preg_match('#^[a-zA-Z0-9._+-]{3, }@[a-z]{2, 7}\.[a-z]{2, 4}#', $email)) {
+                    if(preg_match('#^(+261 | 0[234])[0-9]{7}#', $phone1)) {
+                        $phone2=preg_match('#^(+261 | 0[234])[0-9]{7}#', $phone2) ? $phone2 : '';
+                        
+                        $verify=[
+                            'nom' => strip_tags(trim($nom)),
+                            'prenoms' => strip_tags(trim($prenoms)),
+                            'email' => strip_tags(trim($email)),
+                            'keypass' =>$keypass
+                        ];
+
+                        $donnees=[
+                            'nom' => strip_tags(trim($nom)),
+                            'prenoms' => strip_tags(trim($prenoms)),
+                            'adresse' => strip_tags(trim($adresse)),
+                            'phone1' => strip_tags(trim($phone1)),
+                            'phone2' => strip_tags(trim($phone2)),
+                            'email' => strip_tags(trim($email)),
+                            'dateNaissance' => strip_tags(trim($dateNaissance)),
+                            'lieuNaissance' => strip_tags(trim($lieuNaissance)),
+                            'villeOrigine' => strip_tags(trim($villeOrigine)),
+                            'keypass' => $keypass
+                        ];
+                        
+                        $add = new Membres;
+                        $reponses=$add->addMembres($donnees, $verify);
+                        echo $reponses;
                     }
-                    else{
-                        echo "Il y a une erreur, vous n'êtes pas encore inscrits !";
-                    }
+                    else throw new Exception("Erreur: telephone invalide 😥."); 
                 }
-                unset($userData);
-                unset($personne);
-                unset($donnees);
+                else throw new Exception("Erreur: adresse email invalide 😥.");
             }
-              else throw new Exception("Les données `membres` sont vides !", 1);
-        }
-        catch(Exception $e){
-            $erreurs = [
-                'message' => $e -> getMessage(),
-                'code' => $e -> getCode()
-            ];
-            print_r(json_encode($erreurs, JSON_FORCE_OBJECT));
-        }
-    }
-
-    // *********************** Pour ajouter des formations ***********************
-    public function addFormations($nom, $etablissement, $descriptions){
-        try{
-            if(!empty($nom) && !empty($etablissement)
-                && !empty($_SESSION['id'])){
-                $userData = new GetPersonnesFormations('fanampy');
-                $userData -> setInfoFormations($nom, $etablissement, $descriptions, $_SESSION['id']);
-                $personne = new SetPersonnes('fanampy');
-                $personne -> setFormations($userData -> getInfoFormations());
-                unset($userData);
-                unset($personne);
-                echo '1';
-            }
-            else throw new Exception("Les données `formations` sont vides !", 1);   
-        }
-        catch(Exception $e){
-            $erreurs = [
-                'message' => $e -> getMessage(),
-                'code' => $e -> getCode()
-            ];
-            print_r(json_encode($erreurs, JSON_FORCE_OBJECT));
-        }
-    }
-
-    // ********************** Pour ajouter de fonctions ***********************
-    public function addFonctions($nom, $id_branches, $id_membres){
-        try{
-            if(!empty($nom) && !empty($id_branches) && !empty($_SESSION['id'])){
-                $userData = new GetPersonnesFonctions('fanampy');
-                $userData -> setInfoFonctions($nom, $id_branches, $_SESSION['id']);
-                $personne = new SetPersonnes('fanampy');
-                $personne -> setFonctions($userData -> getInfoFonctions());
-                unset($userData);
-                unset($personne);
-                echo '1';
-            }
-            else throw new Exception("Les données `fonctions` sont vides !", 1);
-        }
-        catch(Exception $e){
-            $erreurs = [
-                'message' => $e -> getMessage(),
-                'code' => $e -> getCode()
-            ];
-            print_r(json_encode($erreurs, JSON_FORCE_OBJECT));
-        }
+            else throw new Exception("Erreur: un des paramètres sont vides pour ajouter MEMBRES 😥.");
     }
 }

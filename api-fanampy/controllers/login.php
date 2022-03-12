@@ -1,11 +1,11 @@
 <?php
 class ControllerLogin {
 
-    public function __construct(string $identifiant, string $password) {
-        if(!empty(trim($identifiant)) && !empty(trim($password))) {
+    public function __construct(string $identifiant, string $keypass) {
+        if(!empty(trim($identifiant)) && !empty(trim($keypass))) {
             $this->data=[
                 'identifiant' => strip_tags($identifiant),
-                'keypass' => $password
+                'keypass' => $keypass
             ];
         }
         else throw new Exception("Erreur: les paramètres d'enthentifications sont vides 😥.");
