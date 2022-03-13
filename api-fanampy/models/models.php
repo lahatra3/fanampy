@@ -320,6 +320,7 @@ class Fonctions extends Database {
             $demande=$database->prepare('INSERT INTO fonctions(nom, id_branches, id_membres)
                 VALUES(:nom, :id_branches, id_membres)');
             $demande->execute($donnees);
+            return 1;
         }
         catch(PDOException $e) {
             $database->rollBack();
