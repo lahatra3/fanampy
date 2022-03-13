@@ -45,6 +45,21 @@ class ControllerAdd {
         else throw new Exception("Erreur: les données à ajouter sont vides MEMBRES 😥.");
     }
 
+    public function formations(string $nom, string $etablissement, string $descriptions, 
+        int $id_membres) {
+
+        if(!empty(trim($nom)) && !empty(trim($id_membres))) {
+            $infos=[
+                'nom' => strip_tags(trim($nom)),
+                'etablissement' => strip_tags(trim($etablissement)),
+                'descriptions' => strip_tags(trim($descriptions))
+            ];
+            $add=new Formations;
+            $reponses=$add->addFormations($infos);
+            echo $reponses;
+        }
+    }
+
     public function fonctions(string $nom, int $id_branches, int $id_membres) {
         if(!empty(trim($nom)) && !empty(trim($id_branches)) && !empty(trim($id_membres))) {
             $infos=[

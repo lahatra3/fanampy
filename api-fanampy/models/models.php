@@ -224,6 +224,7 @@ class Formations extends Database {
                 descriptions, id_membres)
                 VALUES(:nom, :etablissement, :descriptions, :id_membres)');
             $demande->execute($donnees);
+            return 1;
         }
         catch(PDOException $e) {
             $database->rollBack();
