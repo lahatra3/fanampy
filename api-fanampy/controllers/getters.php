@@ -1,60 +1,23 @@
 <?php
-class PersonnesFanampy{
-    private $identifiant = null;
+class ControllerGet {
 
-    public function __construct(string $identifiant){
-        $this -> identifiant =  $identifiant;
+    public function __construct(string $identifiant) {
+        $this->data=[
+            'identifiant' => strip_tags(trim($identifiant))
+        ];
     }
 
-    // ******************* Pour avoir les identités des membres **********************
-    public function dataMembres(){
-        try{
-            $personne = new GetPersonnes('fanampy');
-            $id = new GetPersonnesInfos($this -> identifiant);
-            echo json_encode($personne -> getMembres($id -> getInfo()), JSON_FORCE_OBJECT); 
-        }
-        catch(Exception $e){
-            $erreurs = [
-                'message' => $e -> getMessage(),
-                'code' => $e -> getCode()
-            ];
-            print_r(json_encode($erreurs, JSON_FORCE_OBJECT));
-        }  
-        unset($personne);
-        unset($id);
+    public function membresAll() {
+        $get=new Membres;
+        $reponses=$get->getAllMembres();
+        unset($get);
+        print_r(json_encode($reponses, JSON_FORCE_OBJECT));
     }
 
-    // ********************* Pour avoir les formations **************************
-    public function dataFormations(){
-        try{
-            $personne = new GetPersonnes('fanampy');
-            $id = new GetPersonnesInfos($this -> identifiant);
-            echo json_encode($personne -> getFormations($id -> getInfo()), JSON_FORCE_OBJECT);
-        }
-        catch(Exception $e){
-            $erreurs = [
-                'message' => $e -> getMessage(),
-                'code' => $e -> getCode()
-            ];
-            print_r(json_encode($erreurs, JSON_FORCE_OBJECT));
-        }
-        unset($personne);
-        unset($id);
-    }
-
-    // ********************** Pour avoir les fonctions ***********************
-    public function dataFonctions(){
-        try{
-            $personne = new GetPersonnes('fanampy');
-            $id = new GetPersonnesInfos($this -> identifiant);
-            echo json_encode($personne -> getFonctions($id -> getInfo()), JSON_FORCE_OBJECT);
-        }
-        catch(Exception $e){
-            $erreurs = [
-                'message' => $e -> getMessage(),
-                'code' => $e -> getCode()
-            ];
-            print_r(json_encode($erreurs, JSON_FORCE_OBJECT));
-        }
+    public function membres() {
+        $get=new Membres;
+        $reponses=$get->getMembres($this->data);
+        unset($get);
+        print_r(json_encode($reponses, JSON_FORCE_OBJECT));
     }
 }
