@@ -47,7 +47,7 @@ class Membres extends Database {
         $database = null;
     }
 
-    public function getMembres(array $donnees) {
+    public function getMembres(array $donnees):array | bool {
         try {
             $database=Database::db_connect();
             $demande=$database->prepare('SELECT id, nom, prenoms, adresse, phone1, phone2, email, 
@@ -68,21 +68,20 @@ class Membres extends Database {
         $database=null;
     }
 
-    protected function verifyMembres(array $donnees) {
+    protected function verifyMembres(array $donnees): int {
         $database=Database::db_connect();
         $demande=$database->prepare('SELECT True FROM membres
             WHERE (nom=:nom AND prenoms=:prenoms) OR email=:email OR keypass=SHA2(:keypass, 256)');
         $demande->execute($donnees);
         $reponses=$demande->fetch(PDO::FETCH_ASSOC);
         $demande->closeCursor();
-        if(empty($reponses)) $reponses['TRUE']=0;
-        return $reponses['TRUE'];
+        return empty($reponses)? 0 : 1;
     }
 
     public function addMembres(array $donnees, array $verify) {
         try {
-            $status=0;
-            if($this->verifyMembres($verify)===1) {
+            $status = 0;
+            if($this->verifyMembres($verify) === 0) {
                 $database=Database::db_connect();
                 $demande=$database->prepare('INSERT INTO membres(nom, prenoms, adresse, 
                     phone1, phone2, email, dateNaisssance, lieuNaissance, villeOrigine,
@@ -90,7 +89,7 @@ class Membres extends Database {
                     VALUES(:nom, :prenoms, :adresse, :phone1, :phone2, :email, 
                     :dateNaissance, :lieuNaissance, :villeOrigine, :keypass)');
                 $demande->execute($donnees);
-                $status=1;
+                $status = 1;
             }
             return $status;
         }
@@ -129,14 +128,13 @@ class Membres extends Database {
         $demande->execute($donnees);
         $reponses=$demande->fetch(PDO::FETCH_ASSOC);
         $demande->closeCursor();
-        if(empty($reponses)) $reponses['TRUE']=0;
-        return $reponses['TRUE'];
+        return empty($reponses)? 0 : 1;
     }
 
     public function updateMembresKeypass(array $donnees, array $verify) {
         try {
-            $status=0;
-            if($this->verifyKeypass($verify)===1) {
+            $status = 0;
+            if($this->verifyKeypass($verify) === 1) {
                 $database=Database::db_connect();
                 $demande=$database->prepare('UPDATE membres 
                     SET keypass=SHA2(:newKey, 256)
@@ -179,7 +177,8 @@ class Formations extends Database {
     public function getAllFormations(): array {
         try {
             $database=Database::db_connect();
-            $demande=$database->query('SELECT f.nom, etablissement, descriptions, id_membres
+            $demande=$database->query('SELECT f.nom, f.etablissement, f.descriptions, 
+                f.id_membres, m.prenoms, m.email
                 FROM formations f
                 JOIN membres m ON f.id_membres=m.id
                 WHERE m.active = 1');
@@ -199,10 +198,11 @@ class Formations extends Database {
     public function getFormations(array $donnees): array {
         try {
             $database=Database::db_connect();
-            $demande=$database->query('SELECT f.id, f.nom, f.etablissement, f.descriptions, f.id_membres
+            $demande=$database->query('SELECT f.id, f.nom, f.etablissement, f.descriptions, 
+                f.id_membres, m.prenoms, m.email
                 FROM formations f
                 JOIN membres m ON f.id_membres=m.id
-                WHERE m.active = 1 AND (f.id_membres=:identifiant OR m.email=:identifiant)');
+                WHERE m.active = 1 AND m.id=:identifiant');
             $demande->execute($donnees);
             $reponses=$demande->fetchAll(PDO::FETCH_ASSOC);
             $demande->closeCursor();
@@ -224,7 +224,6 @@ class Formations extends Database {
                 descriptions, id_membres)
                 VALUES(:nom, :etablissement, :descriptions, :id_membres)');
             $demande->execute($donnees);
-            return 1;
         }
         catch(PDOException $e) {
             $database->rollBack();
@@ -276,8 +275,10 @@ class Fonctions extends Database {
     public function getAllFonctions(): array {
         try {
             $database=Database::db_connect();
-            $demande=$database->query('SELECT f.id, f.nom, f.id_branches, f.id_membres
+            $demande=$database->query('SELECT f.id, f.nom, f.id_branches, 
+                b.nom as branches, f.id_membres, m.prenoms, m.email
                 FROM fonctions f
+                JOIN branches b ON f.id_branches = b.id
                 JOIN membres m ON f.id_membres=m.id
                 WHERE m.active = 1');
             $reponses=$demande->fetchAll(PDO::FETCH_ASSOC);
@@ -296,11 +297,12 @@ class Fonctions extends Database {
     public function getFonctions(array $donnees): array {
         try {
             $database=Database::db_connect();
-            $demande=$database->prepare('SELECT f.id, f.nom, f.id_branches, f.id_membres
+            $demande=$database->prepare('SELECT f.id, f.nom, f.id_branches, 
+                b.nom as branches, f.id_membres, m.prenoms, m.email
                 FROM fonctions f
+                JOIN branches b ON f.id_branches = b.id
                 JOIN membres m ON f.id_membres=m.id
-                WHERE m.active = 1 AND (f.id_membres=:identifiant 
-                    OR m.email=:identifiant)');
+                WHERE m.active = 1 AND (m.id=:identifiant)');
             $demande->execute($donnees);
             $reponses=$demande->fetchAll(PDO::FETCH_ASSOC);
             $demande->closeCursor();
@@ -319,7 +321,7 @@ class Fonctions extends Database {
         try {
             $database=Database::db_connect();
             $demande=$database->prepare('INSERT INTO fonctions(nom, id_branches, id_membres)
-                VALUES(:nom, :id_branches, id_membres)');
+                VALUES(:nom, :id_branches, :id_membres)');
             $demande->execute($donnees);
             return 1;
         }
@@ -371,7 +373,7 @@ class Fonctions extends Database {
 
 class Login extends Database {
 
-    public function authentifier(array $donnees) {
+    public function authentifier(array $donnees): array | bool {
         try {
             $database=Database::db_connect();
             $demande=$database->prepare('SELECT True, id, email
