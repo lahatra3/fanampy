@@ -1,11 +1,16 @@
 <?php
-session_start();
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Max-Age: 3600");
-include_once('models/models.php');
-include_once('controllers/controllers.php');
+if($_SERVER('METHOD') === 'OPTIONS') return 0;
+
+require_once 'models/models.php';
+require_once 'controllers/adding.php';
+require_once 'controllers/delete.php';
+require_once 'controllers/getters.php';
+require_once 'controllers/update.php';
+require_once 'controllers/login.php';
 
 try{
     if(!empty($_GET['demande'])){
