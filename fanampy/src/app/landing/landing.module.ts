@@ -10,6 +10,9 @@ import { LandingComponent } from './components/landing/landing.component';
   ],
   imports: [
     CommonModule
+  ],
+  exports: [
+    LandingComponent
   ]
 })
 export class LandingModule { }
