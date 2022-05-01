@@ -110,6 +110,7 @@ class Membres extends Database {
                 SET adresse=:adresse, phone1=:phone1, phone2=:phone2
                 WHERE id=:identifiant');
             $demande->execute($donnees);
+            return 1;
         }
         catch(PDOException $e) {
             $database->rollBack();
@@ -159,6 +160,7 @@ class Membres extends Database {
             $demande=$database->prepare('DELETE FROM membres
                 WHERE id=:identifiant');
             $demande->execute($donnees);
+            return 1;
         }
         catch(PDOException $e) {
             $database->rollBack();
@@ -224,6 +226,7 @@ class Formations extends Database {
                 descriptions, id_membres)
                 VALUES(:nom, :etablissement, :descriptions, :id_membres)');
             $demande->execute($donnees);
+            return 1;
         }
         catch(PDOException $e) {
             $database->rollBack();
@@ -241,6 +244,7 @@ class Formations extends Database {
                 SET nom=:nom, etablissement=:etablissement, descriptions=:descriptions
                     WHERE id=:identifiant');
             $demande->execute($donnees);
+            return 1;
         }
         catch(PDOException $e) {
             $database->rollBack();
@@ -258,6 +262,7 @@ class Formations extends Database {
             $demande=$database->prepare('DELETE FROM formations 
                 WHERE id=:identifiant');
             $demande->execute($donnees);
+            return 1;
         }
         catch(PDOException $e) {
             $database->rollBack();
@@ -338,10 +343,11 @@ class Fonctions extends Database {
     public function updateFonctions(array $donnees) {
         try {
             $database=Database::db_connect();
-            $demande=$database->prepare('UPDATE fonctions
-                SET nom=:nom, id_branches=:id_branches, id_membres=:id_membres
+            $demande=$database->prepare('UPDATE fonctions SET nom=:nom, id_branches=:id_branches,
+                 id_membres=:id_membres
                 WHERE id=:identifiant');
             $demande->execute($donnees);
+            return 1;
         }
         catch(PDOException $e) {
             $database->rollBack();
@@ -359,6 +365,7 @@ class Fonctions extends Database {
             $demande=$database->prepare('DELETE FROM fonctions
                 WHERE id=:identifiant');
             $demande->execute($donnees);
+            return 1;
         }
         catch(PDOException $e) {
             $database->rollBack();
