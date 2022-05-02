@@ -1,7 +1,5 @@
 <?php
 class ControllerAdd {
-    
-    public function __construct() {}
 
     public function membres(string $nom, string $prenoms, string $adresse,
         string $phone1, string $phone2, string $email, string $dateNaissance,

@@ -27,7 +27,7 @@ abstract class Database {
 
 class Membres extends Database {
 
-    public function getAllMembres():array {
+    public function getAllMembres(): array {
         try {
             $database=Database::db_connect();
             $demande=$database -> query('SELECT id, nom, prenoms, adresse, phone1, phone2, email, 
@@ -47,7 +47,7 @@ class Membres extends Database {
         $database = null;
     }
 
-    public function getMembres(array $donnees):array | bool {
+    public function getMembres(array $donnees): array | bool {
         try {
             $database=Database::db_connect();
             $demande=$database->prepare('SELECT id, nom, prenoms, adresse, phone1, phone2, email, 
@@ -78,7 +78,7 @@ class Membres extends Database {
         return empty($reponses)? 0 : 1;
     }
 
-    public function addMembres(array $donnees, array $verify) {
+    public function addMembres(array $donnees, array $verify): int {
         try {
             $status = 0;
             if($this->verifyMembres($verify) === 0) {
@@ -103,7 +103,7 @@ class Membres extends Database {
         $database=null;
     }
 
-    public function updateMembres(array $donnees) {
+    public function updateMembres(array $donnees): int {
         try {
             $database=Database::db_connect();
             $demande=$database->prepare('UPDATE membres
@@ -122,7 +122,7 @@ class Membres extends Database {
         $database=null;
     }
 
-    protected function verifyKeypass(array $donnees) {
+    protected function verifyKeypass(array $donnees): int {
         $database=Database::db_connect();
         $demande=$database->prepare('SELECT True FROM membres
             WHERE email=:email AND keypass=SHA2(:lastKey, 256)');
@@ -132,7 +132,7 @@ class Membres extends Database {
         return empty($reponses)? 0 : 1;
     }
 
-    public function updateMembresKeypass(array $donnees, array $verify) {
+    public function updateMembresKeypass(array $donnees, array $verify): int {
         try {
             $status = 0;
             if($this->verifyKeypass($verify) === 1) {
@@ -154,7 +154,7 @@ class Membres extends Database {
         }
     }
 
-    public function deleteMembres(array $donnees) {
+    public function deleteMembres(array $donnees): int {
         try {
             $database=Database::db_connect();
             $demande=$database->prepare('DELETE FROM membres
@@ -219,7 +219,7 @@ class Formations extends Database {
         $database=null;
     }
 
-    public function addFormations(array $donnees) {
+    public function addFormations(array $donnees): int {
         try {
             $database=Database::db_connect();
             $demande=$database->prepare('INSERT INTO formations(nom, etablissement,
@@ -237,7 +237,7 @@ class Formations extends Database {
         }
     }
 
-    public function updateFormations(array $donnees) {
+    public function updateFormations(array $donnees): int {
         try {
             $database=Database::db_connect();
             $demande=$database->prepare('UPDATE formations 
@@ -256,7 +256,7 @@ class Formations extends Database {
         $database=null;
     }
 
-    public function deleteFormations(array $donnees) {
+    public function deleteFormations(array $donnees): int {
         try {
             $database=Database::db_connect();
             $demande=$database->prepare('DELETE FROM formations 
@@ -322,7 +322,7 @@ class Fonctions extends Database {
         $database=null;
     }
 
-    public function addFonctions(array $donnees) {
+    public function addFonctions(array $donnees): int {
         try {
             $database=Database::db_connect();
             $demande=$database->prepare('INSERT INTO fonctions(nom, id_branches, id_membres)
@@ -340,7 +340,7 @@ class Fonctions extends Database {
         $database=null;
     }
 
-    public function updateFonctions(array $donnees) {
+    public function updateFonctions(array $donnees): int {
         try {
             $database=Database::db_connect();
             $demande=$database->prepare('UPDATE fonctions SET nom=:nom, id_branches=:id_branches,
@@ -359,7 +359,7 @@ class Fonctions extends Database {
         $database=null;
     }
 
-    public function deleteFonctions(array $donnees) {
+    public function deleteFonctions(array $donnees): int {
         try {
             $database=Database::db_connect();
             $demande=$database->prepare('DELETE FROM fonctions
