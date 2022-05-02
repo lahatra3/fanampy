@@ -31,7 +31,6 @@ class JWT {
         if(!empty($donnees) && !empty(trim($donnees['id']))) {
             $resultats = [
                 'id' => $donnees['id'],
-                'prenom_usuel' => $donnees['prenom_usuel'],
                 'mail' => $donnees['mail']
             ];
         }
