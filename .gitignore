@@ -1,1 +1,3 @@
 api-fanampy/models/db.json
+api-fanampy/controllers/jwt-header.json
+api-fanampy/controllers/jwt-secret.php
