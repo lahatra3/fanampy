@@ -46,17 +46,26 @@ class ControllerAdd {
     }
 
     public function formations(string $nom, string $etablissement, string $descriptions, 
-        int $id_membres) {
+        int $id_membres, string $secret) {
 
         if(!empty(trim($nom)) && !empty(trim($id_membres))) {
-            $infos=[
-                'nom' => strip_tags(trim($nom)),
-                'etablissement' => strip_tags(trim($etablissement)),
-                'descriptions' => strip_tags(trim($descriptions))
-            ];
-            $add=new Formations;
-            $reponses=$add->addFormations($infos);
-            echo $reponses;
+            $jwt = new JWT;
+            $token = isValidToken($secret);
+            unset($jwt);
+            if(!empty($token)) {
+                $infos=[
+                    'nom' => strip_tags(trim($nom)),
+                    'etablissement' => strip_tags(trim($etablissement)),
+                    'descriptions' => strip_tags(trim($descriptions))
+                ];
+                $add=new Formations;
+                $reponses=$add->addFormations($infos);
+                echo $reponses;
+            }
+            else {
+                throw new Exception("Erreur: token invalide !");
+                http_response_code(401);
+            }
         }
     }
 
