@@ -48,11 +48,11 @@ class ControllerAdd {
     public function formations(string $nom, string $etablissement, string $descriptions, 
         int $id_membres, string $secret) {
 
-        if(!empty(trim($nom)) && !empty(trim($id_membres))) {
-            $jwt = new JWT;
-            $token = isValidToken($secret);
-            unset($jwt);
-            if(!empty($token)) {
+        $jwt = new JWT;
+        $token = isValidToken($secret);
+        unset($jwt);
+        if(!empty($token)) {
+            if(!empty(trim($nom)) && !empty(trim($id_membres))) {
                 $infos=[
                     'nom' => strip_tags(trim($nom)),
                     'etablissement' => strip_tags(trim($etablissement)),
@@ -62,24 +62,34 @@ class ControllerAdd {
                 $reponses=$add->addFormations($infos);
                 echo $reponses;
             }
-            else {
-                throw new Exception("Erreur: token invalide !");
-                http_response_code(401);
-            }
+            else throw new Exception("Erreur: les données à ajouter sont vides FORMATIONS 😥.");
+        }
+        else {
+            throw new Exception("Erreur: token invalide !");
+            http_response_code(401);
         }
     }
 
-    public function fonctions(string $nom, int $id_branches, int $id_membres) {
-        if(!empty(trim($nom)) && !empty(trim($id_branches)) && !empty(trim($id_membres))) {
-            $infos=[
-                'nom' => strip_tags(trim($nom)),
-                'id_branches' => strip_tags(trim($id_branches)),
-                'id_membres' => strip_tags(trim($id_membres))
-            ];
-            $add=new Fonctions;
-            $reponses=$add->addFonctions($infos);
-            echo $reponses;
+    public function fonctions(string $nom, int $id_branches, int $id_membres, string $secret) {
+        $jwt = new JWT;
+        $token = isValidToken($secret);
+        unset($jwt);
+        if(!empty($token)) {
+            if(!empty(trim($nom)) && !empty(trim($id_branches)) && !empty(trim($id_membres))) {
+                $infos=[
+                    'nom' => strip_tags(trim($nom)),
+                    'id_branches' => strip_tags(trim($id_branches)),
+                    'id_membres' => strip_tags(trim($id_membres))
+                ];
+                $add=new Fonctions;
+                $reponses=$add->addFonctions($infos);
+                echo $reponses;
+            }
+            else throw new Exception("Erreur: les données à ajouter sont vides FONCTIONS 😥.");
         }
-        else throw new Exception("Erreur: les données à ajouter sont vides FONCTIONS 😥.");
+        else {
+            throw new Exception("Erreur: token invalide !");
+            http_response_code(401);
+        }
     }
 }
