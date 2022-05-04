@@ -1,10 +1,11 @@
 <?php
 class ControllerGet {
+    // ============================== MEMBRE ===============================
     public function membresAll() {
         $get=new Membres;
         $reponses=$get->getAllMembres();
         unset($get);
-        print_r(json_encode($reponses, JSON_FORCE_OBJECT));
+        print_r(json_encode($reponses));
     }
 
     public function membres(string $secret) {
@@ -18,10 +19,28 @@ class ControllerGet {
             $get=new Membres;
             $reponses=$get->getMembres($infos);
             unset($get);
-            print_r(json_encode($reponses, JSON_FORCE_OBJECT));
+            print_r(json_encode($reponses));
         }
         else {
             throw new Exception("Erreur: token invalide ...!");
+            http_response_code(401);
+        }
+    }
+
+    // =============================== FORMATIONS ============================
+    public function formationsAll(string $secret) {
+        $jwt = new JWT;
+        $token = isValidToken($secret);
+        unset($jwt);
+        if(!empty($token)) {
+            $get = new Formations;
+            $reponses = $get->getAllFormations();
+            unset($get);
+            print_r(json_encode($reponses));
+
+        }
+        else {
+            throw new Exception("Erreur: token invalide !");
             http_response_code(401);
         }
     }
