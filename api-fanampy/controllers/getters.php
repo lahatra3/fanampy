@@ -44,4 +44,23 @@ class ControllerGet {
             http_response_code(401);
         }
     }
+
+    public function formations(string $secret) {
+        $jwt = new JWT;
+        $token = isValidToken($secret);
+        unset($jwt);
+        if(!empty($token)) {
+            $infos = [
+                'identifiant' => strip_tags(trim($token['id']))
+            ];
+            $get = new Formations;
+            $reponses = $get->getFormations($infos);
+            unset($get);
+            print_r(json_encode($reponses));
+        }
+        else {
+            throw new Exception("Erreur: token invalide !");
+            http_response_code(401);
+        }
+    }
 }
