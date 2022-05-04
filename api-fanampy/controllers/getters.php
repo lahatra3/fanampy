@@ -29,24 +29,15 @@ class ControllerGet {
 
     // =============================== FORMATIONS ============================
     public function formationsAll(string $secret) {
-        $jwt = new JWT;
-        $token = isValidToken($secret);
-        unset($jwt);
-        if(!empty($token)) {
-            $get = new Formations;
-            $reponses = $get->getAllFormations();
-            unset($get);
-            print_r(json_encode($reponses));
-        }
-        else {
-            throw new Exception("Erreur: token invalide !");
-            http_response_code(401);
-        }
+        $get = new Formations;
+        $reponses = $get->getAllFormations();
+        unset($get);
+        print_r(json_encode($reponses));
     }
 
     public function formations(string $secret) {
         $jwt = new JWT;
-        $token = isValidToken($secret);
+        $token = $jwt->isValidToken($secret);
         unset($jwt);
         if(!empty($token)) {
             $infos = [
@@ -63,13 +54,24 @@ class ControllerGet {
         }
     }
 
+    // =============================== FONCTIONS ===============================
     public function fonctionsAll(string $secret) {
+        $get = new Fonctions;
+        $reponses = $get->getAllFonctions();
+        unset($get);
+        print_r(json_encode($reponses));
+    }
+
+    public function fonctions(string $secret) {
         $jwt = new JWT;
-        $token = isValidToken($secret);
+        $token = $jwt->isValidToken();
         unset($jwt);
         if(!empty($token)) {
+            $infos = [
+                'identifiant' => strip_tags(trim($token['id']))
+            ];
             $get = new Fonctions;
-            $reponses = $get->getAllFonctions();
+            $reponses = $get->getFonctions($infos);
             unset($get);
             print_r(json_encode($reponses));
         }
@@ -78,4 +80,5 @@ class ControllerGet {
             http_response_code(401);
         }
     }
+
 }
