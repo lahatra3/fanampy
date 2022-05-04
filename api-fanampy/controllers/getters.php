@@ -37,7 +37,6 @@ class ControllerGet {
             $reponses = $get->getAllFormations();
             unset($get);
             print_r(json_encode($reponses));
-
         }
         else {
             throw new Exception("Erreur: token invalide !");
@@ -55,6 +54,22 @@ class ControllerGet {
             ];
             $get = new Formations;
             $reponses = $get->getFormations($infos);
+            unset($get);
+            print_r(json_encode($reponses));
+        }
+        else {
+            throw new Exception("Erreur: token invalide !");
+            http_response_code(401);
+        }
+    }
+
+    public function fonctionsAll(string $secret) {
+        $jwt = new JWT;
+        $token = isValidToken($secret);
+        unset($jwt);
+        if(!empty($token)) {
+            $get = new Fonctions;
+            $reponses = $get->getAllFonctions();
             unset($get);
             print_r(json_encode($reponses));
         }
