@@ -358,9 +358,8 @@ class Fonctions extends Database {
     public function updateFonctions(array $donnees): int {
         try {
             $database=Database::db_connect();
-            $demande=$database->prepare('UPDATE fonctions SET nom=:nom, id_branches=:id_branches,
-                 id_membres=:id_membres
-                WHERE id=:identifiant');
+            $demande=$database->prepare('UPDATE fonctions SET nom=:nom, id_branches=:id_branches
+                WHERE id=:id AND id_membres=:id_membres');
             $demande->execute($donnees);
             return 1;
         }

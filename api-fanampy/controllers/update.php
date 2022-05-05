@@ -87,4 +87,27 @@ class ControllerUpdate {
             http_response_code(401);
         }
     }
+    
+    // ================================== FONCTIONS =================================
+    public function fonctions(string $nom, int $id_branches, string $id, string $secret) {
+        $jwt = new JWT;
+        $token = $jwt->isValidToken($secret);
+        unset($jwt);
+        if(!empty($token)) {
+            $donnees = [
+                'nom' => strip_tags(trim($nom)),
+                'id_branches' => strip_tags(trim($id_branches)),
+                'id' => strip_tags(trim($id)),
+                'id_membres' => strip_tags(trim($token['id']))
+            ];
+            $update = new Fonctions;
+            $reponses = $update->updateFonctions($donnees);
+            unset($update);
+            echo $reponses;
+        }
+        else {
+            throw new Exception("Erreur: token invalide !");
+            http_response_code(401);
+        }
+    }
 }
