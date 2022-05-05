@@ -10,9 +10,12 @@ class ControllerLogin {
             $login=new Login;
             $resultats=$login->authentifier($infos);
             unset($login);
-            print_r(json_encode($resultats, JSON_FORCE_OBJECT));
+            print_r(json_encode($resultats));
         }
-        else throw new Exception("Erreur: les paramètres d'enthentifications sont vides 😥.");
+        else {
+            throw new Exception("Erreur: les paramètres d'enthentifications sont vides 😥.");
+            http_response_code(400);
+        }
     }
 
     public function tokenLogin(string $identifiant, string $password, string $secret) {
@@ -31,9 +34,12 @@ class ControllerLogin {
                     $resultats['token'] = $token->generateToken($header, $resultats, $secret, 84600);
                     unset($token);
                 }
+                print_r(json_encode($resultats));
             }
-            print_r(json_encode($resultats, JSON_FORCE_OBJECT));
         }
-        else throw new Exception("Erreur: les paramètres d'enthentifications sont vides 😥.");
+        else {
+            throw new Exception("Erreur: les paramètres d'enthentifications sont vides 😥.");
+            http_response_code(400);
+        }
     }
 }

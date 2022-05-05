@@ -68,10 +68,10 @@ class Membres extends Database {
         $database=null;
     }
 
-    protected function verifyMembres(array $donnees): int {
+    private function verifyMembres(array $donnees): int {
         $database=Database::db_connect();
         $demande=$database->prepare('SELECT True FROM membres
-            WHERE (nom=:nom AND prenoms=:prenoms) OR email=:email OR keypass=SHA2(:keypass, 256)');
+            WHERE (nom=:nom AND prenoms=:prenoms) OR email=:email OR phone1=:phone1 OR phone2=:phone2');
         $demande->execute($donnees);
         $reponses=$demande->fetch(PDO::FETCH_ASSOC);
         $demande->closeCursor();
