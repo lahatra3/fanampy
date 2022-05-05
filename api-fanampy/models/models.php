@@ -139,7 +139,7 @@ class Membres extends Database {
     private function verifyKeypass(array $donnees): int {
         $database=Database::db_connect();
         $demande=$database->prepare('SELECT True FROM membres
-            WHERE email=:email AND keypass=SHA2(:lastKey, 256)');
+            WHERE id=:id AND keypass=SHA2(:lastKey, 256)');
         $demande->execute($donnees);
         $reponses=$demande->fetch(PDO::FETCH_ASSOC);
         $demande->closeCursor();
@@ -166,6 +166,7 @@ class Membres extends Database {
                 'message' => "Nous n'avons pas mettre à jours MOT DE PASSE. ".$e->getMessage()
             ], JSON_FORCE_OBJECT));
         }
+        $database=null;
     }
 
     public function deleteMembres(array $donnees): int {

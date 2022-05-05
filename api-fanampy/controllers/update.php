@@ -32,4 +32,40 @@ class ControllerUpdate {
             http_response_code(401);
         }
     }
+
+    public function membresPassword(string $lastKey, string $newKey, string $secret) {
+        $jwt = new JWT;
+        $token = $jwt->isValidToken($secret);
+        unset($jwt);
+        if(!empty($token)) {
+            if(!empty(trim($lastKey)) && !empty(trim($newKey))) {
+                $donnees = [
+                    'newKey' => $newKey,
+                    'id' => strip_tags(trim($token['id']))
+                ];
+
+                $verify = [
+                    'id' => strip_tags(trim($token['id'])),
+                    'lastKey' => $lastKey
+                ];
+                $update = new Membres;
+                $reponses = $update->updateMembresKeypass($donnees, $verify);
+                unset($update);
+                echo $reponses;
+            }
+            else {
+                throw new Exception("Erreur: un des paramètres est vide !");
+                http_response_code(400);
+            }
+        }
+        else {
+            throw new Exception("Erreur: token invalide !");
+            http_response_code(401);
+        }
+    }
+
+    // =================================== FORMATIONS ================================
+    public function formations() {
+
+    }
 }
