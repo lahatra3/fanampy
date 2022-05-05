@@ -71,7 +71,7 @@ class Membres extends Database {
     private function verifyMembres(array $donnees): int {
         $database=Database::db_connect();
         $demande=$database->prepare('SELECT True FROM membres
-            WHERE (nom=:nom AND prenoms=:prenoms) OR email=:email OR phone1=:phone1 OR phone2=:phone2');
+            WHERE (nom=:nom AND prenoms=:prenoms) OR email=:email OR phone1=:phone1');
         $demande->execute($donnees);
         $reponses=$demande->fetch(PDO::FETCH_ASSOC);
         $demande->closeCursor();
@@ -84,9 +84,9 @@ class Membres extends Database {
             if($this->verifyMembres($verify) === 0) {
                 $database=Database::db_connect();
                 $demande=$database->prepare('INSERT INTO membres(nom, prenoms, adresse, 
-                    phone1, phone2, email, dateNaisssance, lieuNaissance, villeOrigine,
+                    phone1, email, dateNaisssance, lieuNaissance, villeOrigine,
                     keypass)
-                    VALUES(:nom, :prenoms, :adresse, :phone1, :phone2, :email, 
+                    VALUES(:nom, :prenoms, :adresse, :phone1, :email, 
                     :dateNaissance, :lieuNaissance, :villeOrigine, :keypass)');
                 $demande->execute($donnees);
                 $status = 1;
@@ -103,14 +103,28 @@ class Membres extends Database {
         $database=null;
     }
 
-    public function updateMembres(array $donnees): int {
+    private function verifyPhone(array $donnees): int {
+        $database=Database::db_connect();
+        $demande=$database->prepare('SELECT True FROM membres
+            WHERE phone1=:phone1');
+        $demande->execute($donnees);
+        $reponses=$demande->fetch(PDO::FETCH_ASSOC);
+        $demande->closeCursor();
+        return !empty($reponses) ? 1 : 0;     
+    }
+
+    public function updateMembres(array $donnees, array $verify): int {
         try {
-            $database=Database::db_connect();
-            $demande=$database->prepare('UPDATE membres
-                SET adresse=:adresse, phone1=:phone1, phone2=:phone2
-                WHERE id=:identifiant');
-            $demande->execute($donnees);
-            return 1;
+            $status = 0;
+            if($this->verifyPhone($verify) === 0) {
+                $database=Database::db_connect();
+                $demande=$database->prepare('UPDATE membres
+                    SET adresse=:adresse, phone1=:phone1
+                    WHERE id=:id');
+                $demande->execute($donnees);
+                $status = 1;
+            }
+            return $status;
         }
         catch(PDOException $e) {
             $database->rollBack();
@@ -122,7 +136,7 @@ class Membres extends Database {
         $database=null;
     }
 
-    protected function verifyKeypass(array $donnees): int {
+    private function verifyKeypass(array $donnees): int {
         $database=Database::db_connect();
         $demande=$database->prepare('SELECT True FROM membres
             WHERE email=:email AND keypass=SHA2(:lastKey, 256)');
@@ -139,7 +153,7 @@ class Membres extends Database {
                 $database=Database::db_connect();
                 $demande=$database->prepare('UPDATE membres 
                     SET keypass=SHA2(:newKey, 256)
-                    WHERE id=:identifiant');
+                    WHERE id=:id');
                 $demande->execute($donnees);
                 $status = 1;
             }
@@ -385,7 +399,7 @@ class Login extends Database {
             $database=Database::db_connect();
             $demande=$database->prepare('SELECT True, id, email
                 FROM membres
-                WHERE (email=:identifiant OR phone1=:identifiant OR phone2=:identifiant) 
+                WHERE (email=:identifiant OR phone1=:identifiant) 
                     AND keypass=SHA2(:keypass, 256)');
             $demande->execute($donnees);
             $reponses=$demande->fetch(PDO::FETCH_ASSOC);

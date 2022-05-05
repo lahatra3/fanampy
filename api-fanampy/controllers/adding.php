@@ -2,7 +2,7 @@
 class ControllerAdd {
     // ============================== MEMBRES ================================
     public function membres(string $nom, string $prenoms, string $adresse,
-        string $phone1, string $phone2, string $email, string $dateNaissance,
+        string $phone1, string $email, string $dateNaissance,
         string $lieuNaissance, string $villeOrigine, string $keypass) {
 
         if(!empty(trim($nom)) && !empty(trim($prenoms))  && !empty(trim($adresse))
@@ -11,15 +11,12 @@ class ControllerAdd {
             && !empty(trim($keypass))) {
 
             if(preg_match('#^[a-zA-Z0-9_+.-]+@[a-z]{2,7}\.[a-z]{2,4}$#', $email)) {
-                if(preg_match('#^(\+261|0)3[2-4][0-9]{7}$#', $phone1)) {
-                    $phone2=preg_match('#^(\+261|0)3[2-4][0-9]{7}$#', $phone2) ? $phone2 : '';
-                    
+                if(preg_match('#^(\+261|0)3[2-4][0-9]{7}$#', $phone1)) {                    
                     $verify=[
                         'nom' => strip_tags(trim($nom)),
                         'prenoms' => strip_tags(trim($prenoms)),
                         'email' => strip_tags(trim($email)),
                         'phone1' => strip_tags(trim($phone1)),
-                        'phone2' => strip_tags(trim($phone2))
                     ];
 
                     $donnees=[
@@ -27,7 +24,6 @@ class ControllerAdd {
                         'prenoms' => strip_tags(trim($prenoms)),
                         'adresse' => strip_tags(trim($adresse)),
                         'phone1' => strip_tags(trim($phone1)),
-                        'phone2' => strip_tags(trim($phone2)),
                         'email' => strip_tags(trim($email)),
                         'dateNaissance' => strip_tags(trim($dateNaissance)),
                         'lieuNaissance' => strip_tags(trim($lieuNaissance)),
@@ -55,6 +51,7 @@ class ControllerAdd {
         }
     }
 
+    // ============================== FORMATIONS =============================
     public function formations(string $nom, string $etablissement, string $descriptions, string $secret) {
 
         $jwt = new JWT;
@@ -84,6 +81,7 @@ class ControllerAdd {
         }
     }
 
+    // ============================== FONCTIONS ==============================
     public function fonctions(string $nom, int $id_branches, string $secret) {
         $jwt = new JWT;
         $token = isValidToken($secret);

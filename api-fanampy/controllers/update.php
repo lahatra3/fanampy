@@ -1,78 +1,35 @@
 <?php
-class UpadateFanampy{
-    private $defaultValue = null;
-    public function __construct(string $name){
-        $this -> defaultValue = $name;
-    }
+class ControllerUpdate {
 
-    // ***************** FOR UPDATING MEMBRES *****************
-    public function getUpdateMembres(string $adresse, string $phone1,
-        string $phone2, string $email, int $id){
-        try{
-            if(!empty($id)){
-                $userData = new UpdatePersonnesMembres($id);
-                $userData -> setInfoUpdateMembres($adresse, $phone1, $phone2, $email);
-                $personne = new UpdatePersonnes('fanampy');
-                $personne -> updateMembres($userData -> getInfoUpdateMembres());
-                unset($userData);
-                unset($personne);
-                echo '1';
-            }
-            else throw new Exception("Aucun numéro d'identification reçu", 1);
-        }
-        catch(Exception $e){
-            $erreurs = [
-                'message' => $e -> getMessage(),
-                'code' => $e -> getCode()
-            ];
-            print_r(json_encode($erreurs, JSON_FORCE_OBJECT));
-        }
-    }
+    // ==================================== MEMBRES =================================
+    public function membres(string $adresse, string $phone, string $secret) {
+        $jwt = new JWT;
+        $token = $jwt->isValidToken($secret);
+        unset($jwt);
+        if(!empty($token)) {
+            if(!empty(trim($adresse)) && !empty(trim($phone))) {
+                $donnees = [
+                    'adresse' => strip_tags(trim($adresse)),
+                    'phone1' => strip_tags(trim($phone)),
+                    'id' => strip_tags(trim($token['id']))
+                ];
 
-    // ********************** FOR UPDATING FORMATIONS ********************
-    public function getUpdateFormations(string $nom, string $etablissement,
-         string $descriptions, int $id){
-        try{
-            if(!empty($id)){
-                $userData = new UpdatePersonnesFormations($id);
-                $userData -> setInfoUpdateFormations($nom, $etablissement, $descriptions);
-                $personne = new UpdatePersonnes('fanampy');
-                $personne -> updateFormations($userData -> getInfoUpdateFormations());
-                unset($userData);
-                unset($personne);
-                echo '1';
+                $verify = [
+                    'phone1' => strip_tags(trim($phone))
+                ];
+                $update = new Membres;
+                $reponses = $update->updateMembres($donnees, $verify);
+                unset($update);
+                echo $reponses;
             }
-            else throw new Exception("Aucun numéro d'identification reçu", 1);
-        }
-        catch(Exception $e){
-            $erreurs = [
-                'message' => $e -> getMessage(),
-                'code' => $e -> getCode()
-            ];
-            print_r(json_encode($erreurs, JSON_FORCE_OBJECT));
-        }
-    }
-
-    // ********************* FOR UPDATING FONCTIONS *********************
-    public function getUpdateFonctions(string $nom, int $id_branches, int $id){
-        try{
-            if(!empty($id)){
-                $userData = new UpdatePersonnesFonctions($id);
-                $userData -> setInfoUpdateFonctions($nom, $id_branches);
-                $personne = new UpdatePersonnes('fanampy');
-                $personne -> updateFonctions($userData -> getInfoUpdateFonctions());
-                unset($userData);
-                unset($personne);
-                echo '1';
+            else {
+                throw new Exception("Erreur: un des paramètres est vide !");
+                http_response_code(400);
             }
-            else throw new Exception("Aucun numéro d'identification reçu", 1);
         }
-        catch(Exception $e){
-            $erreurs = [
-                'message' => $e -> getMessage(),
-                'code' => $e -> getCode()
-            ];
-            print_r(json_encode($erreurs, JSON_FORCE_OBJECT));
+        else {
+            throw new Exception("Erreur: token invalide !");
+            http_response_code(401);
         }
     }
 }
