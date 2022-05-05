@@ -257,7 +257,7 @@ class Formations extends Database {
             $database=Database::db_connect();
             $demande=$database->prepare('UPDATE formations 
                 SET nom=:nom, etablissement=:etablissement, descriptions=:descriptions
-                    WHERE id=:identifiant');
+                    WHERE id=:id AND id_membres=:id_membres');
             $demande->execute($donnees);
             return 1;
         }

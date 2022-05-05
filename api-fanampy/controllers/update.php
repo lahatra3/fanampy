@@ -65,7 +65,26 @@ class ControllerUpdate {
     }
 
     // =================================== FORMATIONS ================================
-    public function formations() {
-
+    public function formations(string $nom, string $etablissement, string $descriptions, int $id, string $secret) {
+        $jwt = new JWT;
+        $token = $jwt->isValidToken($secret);
+        unset($jwt);
+        if(!empty($token)) {
+            $donnees = [
+                'nom' => strip_tags(trim($nom)),
+                'etablissement' => strip_tags(trim($etablissement)),
+                'descriptions' => strip_tags(trim($descriptions)),
+                'id' => strip_tags(trim($id)),
+                'id_membres' => strip_tags(trim($token['id']))
+            ];
+            $update = new Formations;
+            $reponses = $update->updateFormations($donnees);
+            unset($update);
+            echo $reponses;
+        }
+        else {
+            throw new Exception("Erreur: token invalide !");
+            http_response_code(401);
+        }
     }
 }
