@@ -30,7 +30,7 @@ class Membres extends Database {
     public function getAllMembres(): array {
         try {
             $database=Database::db_connect();
-            $demande=$database -> query('SELECT id, nom, prenoms, adresse, phone1, phone2, email, 
+            $demande=$database -> query('SELECT id, nom, prenoms, adresse, phone1, email, 
                     dateNaissance, lieuNaissance, villeOrigine, date_debut, date_fin, active
                 FROM membres 
                 WHERE active = 1');
@@ -50,10 +50,10 @@ class Membres extends Database {
     public function getMembres(array $donnees): array | bool {
         try {
             $database=Database::db_connect();
-            $demande=$database->prepare('SELECT id, nom, prenoms, adresse, phone1, phone2, email, 
+            $demande=$database->prepare('SELECT id, nom, prenoms, adresse, phone1, email, 
                  dateNaissance, lieuNaissance, villeOrigine, date_debut, date_fin, active
                 FROM membres 
-                WHERE active = 1 AND (id=:identifiant OR email=:identifiant)');
+                WHERE active = 1 AND id=:id');
             $demande->execute($donnees);
             $reponses=$demande->fetch(PDO::FETCH_ASSOC);
             $demande->closeCursor();
@@ -173,7 +173,7 @@ class Membres extends Database {
         try {
             $database=Database::db_connect();
             $demande=$database->prepare('DELETE FROM membres
-                WHERE id=:identifiant');
+                WHERE id=:id');
             $demande->execute($donnees);
             return 1;
         }
@@ -219,7 +219,7 @@ class Formations extends Database {
                 f.id_membres, m.prenoms, m.email
                 FROM formations f
                 JOIN membres m ON f.id_membres=m.id
-                WHERE m.active = 1 AND m.id=:identifiant');
+                WHERE m.active = 1 AND m.id=:id');
             $demande->execute($donnees);
             $reponses=$demande->fetchAll(PDO::FETCH_ASSOC);
             $demande->closeCursor();
@@ -322,7 +322,7 @@ class Fonctions extends Database {
                 FROM fonctions f
                 JOIN branches b ON f.id_branches = b.id
                 JOIN membres m ON f.id_membres=m.id
-                WHERE m.active = 1 AND (m.id=:identifiant)');
+                WHERE m.active = 1 AND (m.id=:id)');
             $demande->execute($donnees);
             $reponses=$demande->fetchAll(PDO::FETCH_ASSOC);
             $demande->closeCursor();
@@ -377,7 +377,7 @@ class Fonctions extends Database {
         try {
             $database=Database::db_connect();
             $demande=$database->prepare('DELETE FROM fonctions
-                WHERE id=:identifiant');
+                WHERE id=:id');
             $demande->execute($donnees);
             return 1;
         }
